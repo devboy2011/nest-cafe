@@ -21,5 +21,12 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "webpack-hmr.config.js" // Include the specific file
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
