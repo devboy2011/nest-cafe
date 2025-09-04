@@ -1,16 +1,25 @@
-import { Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ResponseData } from 'src/global/globalClass';
 import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
+import { Product } from 'src/models/product.model';
 
 @Controller('api/products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get('/all')
-  getProducts(): ResponseData<string> {
+  getProducts(): ResponseData<Product[]> {
     try {
-      return new ResponseData<string>(
+      return new ResponseData<Product[]>(
         this.productService.getProducts(),
         HttpStatus.SUCCESS,
         'Product list retrieved successfully',
@@ -18,7 +27,11 @@ export class ProductController {
     } catch (error) {
       console.log(error);
 
-      return new ResponseData<string>('', HttpStatus.ERROR, HttpMessage.ERROR);
+      return new ResponseData<Product[]>(
+        [],
+        HttpStatus.ERROR,
+        HttpMessage.ERROR,
+      );
     }
   }
 
@@ -38,17 +51,23 @@ export class ProductController {
   }
 
   @Get('/:id')
-  getProductById(): ResponseData<string> {
+  getProductById(@Param('id') id: number): ResponseData<Product> {
     try {
-      return new ResponseData<string>(
-        this.productService.getProductById(),
+      return new ResponseData<Product>(
+        this.productService.getProductById(id),
         HttpStatus.SUCCESS,
         'Product retrieved successfully',
       );
     } catch (error) {
       console.log(error);
 
-      return new ResponseData<string>('', HttpStatus.ERROR, HttpMessage.ERROR);
+      throw new HttpException(
+        {
+          status: HttpStatus.ERROR,
+          message: 'Product retrieved failed',
+        },
+        HttpStatus.ERROR,
+      );
     }
   }
 
