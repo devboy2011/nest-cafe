@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Body,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ResponseData } from 'src/global/globalClass';
@@ -17,10 +18,10 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get('/all')
-  getProducts(): ResponseData<Product[]> {
+  async getProducts() {
     try {
       return new ResponseData<Product[]>(
-        this.productService.getProducts(),
+        await this.productService.getProducts(),
         HttpStatus.SUCCESS,
         'Product list retrieved successfully',
       );
@@ -36,10 +37,16 @@ export class ProductController {
   }
 
   @Post()
-  createProduct(): ResponseData<string> {
+  async createProduct(
+    @Body() body: { name: string; price: number; product_id: string },
+  ) {
     try {
-      return new ResponseData<string>(
-        this.productService.createProduct(),
+      return new ResponseData<Product>(
+        await this.productService.createProduct(
+          body.name,
+          body.price,
+          body.product_id,
+        ),
         HttpStatus.SUCCESS,
         'Product posted successfully',
       );
@@ -51,10 +58,12 @@ export class ProductController {
   }
 
   @Get('/:id')
-  getProductById(@Param('id') id: number): ResponseData<Product> {
+  async getProductById(
+    @Param('id') id: number,
+  ): Promise<ResponseData<Product>> {
     try {
       return new ResponseData<Product>(
-        this.productService.getProductById(id),
+        await this.productService.getProductById(id),
         HttpStatus.SUCCESS,
         'Product retrieved successfully',
       );

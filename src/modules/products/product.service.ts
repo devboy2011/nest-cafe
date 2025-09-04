@@ -1,27 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { Product } from 'src/models/product.model';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Product } from './schemas/product.schema';
+
+import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class ProductService {
-  private products: Product[] = [
-    { id: 1, category: 2, price: 18000, productName: 'Black Coffee' },
-    { id: 2, category: 2, price: 20000, productName: 'Bac siu' },
-    { id: 3, category: 1, price: 25000, productName: 'Matcha Latte' },
-    { id: 4, category: 1, price: 25000, productName: 'Latte' },
-  ];
+  constructor(
+    @InjectModel(Product.name) private productModel: Model<Product>,
+  ) {}
 
-  getProducts(): Product[] {
-    return this.products;
+  async getProducts(): Promise<Product[]> {
+    return this.productModel.find().exec();
   }
 
-  createProduct(): string {
-    return 'POST PRODUCT';
+  async createProduct(
+    name: string,
+    price: number,
+    product_id: string,
+  ): Promise<Product> {
+    const created = new this.productModel({ product_id, name, price });
+    return created.save();
   }
 
-  getProductById(id: number): Product {
-    return (
-      this.products.find((item) => item.id === Number(id)) || ({} as Product)
-    );
+  async getProductById(id: number): Promise<Product> {
+    const product = await this.productModel.findOne({ product_id: id }).exec();
+    if (!product) {
+      throw new NotFoundException(`Product with id ${id} not found`);
+    }
+    return product;
   }
 
   updateProductById(): string {
