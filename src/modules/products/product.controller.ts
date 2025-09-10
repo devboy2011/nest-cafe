@@ -11,7 +11,7 @@ import {
 import { ProductService } from './product.service';
 import { ResponseData } from 'src/global/globalClass';
 import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
-import { Product } from 'src/models/product.model';
+import { Product } from './schemas/product.schema';
 
 @Controller('api/products')
 export class ProductController {
@@ -59,7 +59,7 @@ export class ProductController {
 
   @Get('/:id')
   async getProductById(
-    @Param('id') id: number,
+    @Param('id') id: string,
   ): Promise<ResponseData<Product>> {
     try {
       return new ResponseData<Product>(
